@@ -43,7 +43,7 @@ router.get("/", (req, res) => {
     });
 });
 
-router.get("/:id", (req, res) => {
+router.get("/:id", validateUserId, (req, res) => {
   // do your magic!
   Users.getById(req.params.id)
     .then(post => {
@@ -67,7 +67,7 @@ router.get("/:id/posts", (req, res) => {
     });
 });
 
-router.delete("/:id", (req, res) => {
+router.delete("/:id", validateUserId, (req, res) => {
   // do your magic!
   Users.remove(req.params.id)
     .then(removed => {
@@ -79,7 +79,7 @@ router.delete("/:id", (req, res) => {
     });
 });
 
-router.put("/:id", (req, res) => {
+router.put("/:id", validateUserId, (req, res) => {
   // do your magic!
   const { id } = req.params;
   const changes = req.body;
@@ -97,6 +97,21 @@ router.put("/:id", (req, res) => {
 
 function validateUserId(req, res, next) {
   // do your magic!
+  const { id } = req.params;
+  Users.getById(id)
+    .then(user => {
+      if (!user) {
+        res.status(400).json({ message: "Invalid user ID" });
+      } else {
+        req.user = user;
+        console.log(req.user);
+
+        next();
+      }
+    })
+    .catch(err => {
+      res.status(500).json({ message: "Could not find user" });
+    });
 }
 
 function validateUser(req, res, next) {
