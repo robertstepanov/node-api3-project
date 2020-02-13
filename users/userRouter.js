@@ -16,7 +16,7 @@ router.post("/", (req, res) => {
     });
 });
 
-router.post("/:id/posts", (req, res) => {
+router.post("/:id/posts", validateUser, (req, res) => {
   // do your magic!
   const { id } = req.params;
   const post = { ...req.body, post_id: id };
@@ -116,10 +116,36 @@ function validateUserId(req, res, next) {
 
 function validateUser(req, res, next) {
   // do your magic!
+  const user = req.body;
+  Users.get(user)
+    .then(user => {
+      if (!user) {
+        res.status(400).json({ message: "The user data is missing" });
+      } else {
+        !user.name;
+        res.status(400).json({ message: "Missing required name field" });
+
+        next();
+      }
+    })
+    .catch(err => {
+      res.status(500).json({ message: "Error validating user" });
+    });
 }
 
 function validatePost(req, res, next) {
   // do your magic!
+  const { id } = req.params;
+  const post = { ...req.body, user_id: id };
+  if (!post) {
+    res.status(400).json({ message: "No post" });
+  } else if (!post.text) {
+    res.status(400).json({ message: "No text in the post" });
+  } else {
+    req.post = post;
+
+    next();
+  }
 }
 
 module.exports = router;
