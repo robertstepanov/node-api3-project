@@ -10,7 +10,6 @@ const server = require("./server");
 // server.use(express.json());
 
 // server.use('/api/users', userRouter)
-
-server.listen(4000, () => {
-  console.log("\n*** Server is running on localhost:4000 **\n");
-});
+const port = process.env.PORT || 4000;
+server.listen(port, () => 
+  console.log("\n*** Server is running on localhost:4000 **\n"));
